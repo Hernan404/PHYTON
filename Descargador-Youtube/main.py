@@ -106,7 +106,9 @@ download_choice.set("Video MP4")
 
 download_menu = tkinter.OptionMenu(app, download_choice, "Video MP4" , "Audio MP3")
 download_menu.config(bg="gray", fg="white")
-download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
+download_menu.pack(padx=10, pady=10)
+
+#download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
 #relx= costado; rely= altura
 
 # termino la descarga 
