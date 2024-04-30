@@ -1,6 +1,6 @@
 import tkinter
 import customtkinter
-
+import os
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError, VideoUnavailable
 from moviepy.editor import VideoFileClip
@@ -14,9 +14,9 @@ def startDownload():
         ytObject = YouTube(ytLink, on_progress_callback=on_progress)
         
 
-        if download_choice.get() == "Video":
+        if download_choice.get() == "Video MP4":
             video = ytObject.streams.get_highest_resolution()
-            file_extension = video.mine_type.split("/")[-1]
+            file_extension = video.mime_type.split("/")[-1]
             filename = video.default_filename
         else:
             video = ytObject.streams.filter(only_audio=True).first()
@@ -26,16 +26,21 @@ def startDownload():
         if video:
             title_label.configure(text=ytObject.title, text_color="white")
             finishLabel.configure(text="")
-            video.download(filename="temp." + file_extension)
-            if download_choice.get() == "MP3":
-                convert_to_mp3("temp." + file_extension, filename)
-            else: 
-                #renombro archivo temporal
-                import os 
+            
+            video.download(filename=(video.default_filename.replace(".mp4", "") + "." + file_extension))
+
+            if download_choice.get() == "Audio MP3":
+
+                if convert_to_mp3("temp." + file_extension, filename):
+                    os.remove("temp." + file_extension)
+                    print("Descarga Completada")
+                    finishLabel.configure(text="Descargado!")
+            else:
                 os.rename("temp." + file_extension, filename)
-            print("Descarga Completada")
-            finishLabel.configure(text="Descargado!")
-            #progressBar.set(100)
+                print("Descarga Completada")
+                finishLabel.configure(text="Descargado!")
+        
+        
         else:
             print("no tiene resolucion adecuada")
             finishLabel.configure(text="No tiene resolucion adecuada", text_color="red")  
@@ -101,11 +106,11 @@ link.pack()
 
 
 # menu desplegable
-download_choice = tkinter.StringVar(app)
+download_choice = customtkinter.StringVar(app)
 download_choice.set("Video MP4")
 
-download_menu = tkinter.OptionMenu(app, download_choice, "Video MP4" , "Audio MP3")
-download_menu.config(bg="gray", fg="white")
+download_menu = customtkinter.CTkOptionMenu(app, values=["Video MP4" , "Audio MP3"], command=lambda value: download_choice.set(value)) 
+#download_menu.config(bg="gray", fg="white")
 download_menu.pack(padx=10, pady=10)
 
 #download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
@@ -118,7 +123,7 @@ finishLabel.pack()
 
 # botton de descarga 
 download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
-download.pack(padx=10, pady=10)
+download.pack(padx=5, pady=5)
 
 
 # corro la app
