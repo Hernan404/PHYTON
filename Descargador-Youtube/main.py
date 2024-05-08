@@ -1,3 +1,4 @@
+
 import tkinter
 import customtkinter
 import os
@@ -76,9 +77,6 @@ def choose_folder():
      folder_selected = filedialog.askdirectory()
      folder_path_var.set(folder_selected)
 
-#def choose_resolution():
-#    resolution_selected = resolutions_choice.get()
-#    print("resolution selected:", resolution_selected)
 
 
 
@@ -116,13 +114,19 @@ url_var = tkinter.StringVar() # hago una variable url var para tener la ultima i
 link = customtkinter.CTkEntry(app, width=350, height=40, textvariable=url_var)
 link.pack()
 
+# botton de descarga 
+download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
+#download.pack(side="right", padx=15, pady=15)
+download.place(relx=1.0, rely=0, anchor="ne", padx=5, pady=5)
+link.pack(side="left", padx=5, pady=5)
+
+
 
 # menu desplegable
 download_choice = customtkinter.StringVar(app)
 download_choice.set("Video MP4")
 
 download_menu = customtkinter.CTkOptionMenu(app, values=["Video MP4" , "Audio MP3"], command=lambda value: download_choice.set(value)) 
-#download_menu.config(bg="gray", fg="white")
 download_menu.pack(padx=10, pady=10)
 
 #download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
@@ -143,17 +147,20 @@ browse_button.pack(padx=10, pady=10)
 finishLabel = customtkinter.CTkLabel(app, text="")
 finishLabel.pack()
 
+resolution_frame = customtkinter.CTkFrame(app)
+resolution_frame.pack(padx=10, pady=10)
+
 # selector de resolucion
 resolutions = ["720p", "480p", "360p"]
 
 resolutions_var = tkinter.StringVar(app)
-resolutions_combobox = tkinter.Combobox(link_frame, values= resolutions, text_variable=resolutions_var )
-resolutions_combobox.pack(pady=("10p" , "5p"))
-resolutions_combobox.set("720px")
+resolutions_combobox = customtkinter.CTkComboBox(resolution_frame, values= resolutions, variable=resolutions_var )
+resolutions_combobox.pack(padx=40, pady=20)
+resolutions_combobox.set("720p")
+#resolutions_combobox.place(x=50, y=10)
 
-# botton de descarga 
-download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
-download.pack(padx=5, pady=5)
+
+
 
 
 
