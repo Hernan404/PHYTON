@@ -1,4 +1,3 @@
-
 import tkinter
 import customtkinter
 import os
@@ -79,7 +78,6 @@ def choose_folder():
 
 
 
-
 # configuracion 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("blue")
@@ -116,9 +114,9 @@ link.pack()
 
 # botton de descarga 
 download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
-#download.pack(side="right", padx=15, pady=15)
-download.place(relx=1.0, rely=0, anchor="ne", padx=5, pady=5)
-link.pack(side="left", padx=5, pady=5)
+download.pack(padx=15, pady=15)
+#download.place(relx=1.0, rely=0, anchor="ne", padx=5, pady=5)
+link.pack(padx=5, pady=5)
 
 
 
@@ -127,7 +125,9 @@ download_choice = customtkinter.StringVar(app)
 download_choice.set("Video MP4")
 
 download_menu = customtkinter.CTkOptionMenu(app, values=["Video MP4" , "Audio MP3"], command=lambda value: download_choice.set(value)) 
-download_menu.pack(padx=10, pady=10)
+download_menu.pack(padx=0, pady=0)
+#download_menu.place(relx=0.20, rely=0.20,) 
+                    #anchor=tkinter.CENTER)
 
 #download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
 #relx= costado; rely= altura
@@ -148,22 +148,17 @@ finishLabel = customtkinter.CTkLabel(app, text="")
 finishLabel.pack()
 
 resolution_frame = customtkinter.CTkFrame(app)
-resolution_frame.pack(padx=10, pady=10)
+resolution_frame.pack(padx=5, pady=5)
 
 # selector de resolucion
-resolutions = ["720p", "480p", "360p"]
+resolutions = ["1080p","720p", "480p", "360p"]
 
 resolutions_var = tkinter.StringVar(app)
 resolutions_combobox = customtkinter.CTkComboBox(resolution_frame, values= resolutions, variable=resolutions_var )
-resolutions_combobox.pack(padx=40, pady=20)
-resolutions_combobox.set("720p")
+resolutions_combobox.pack(padx=1, pady=1)
+resolutions_combobox.set("1080p")
+
 #resolutions_combobox.place(x=50, y=10)
-
-
-
-
-
-
 
 # corro la app
 app.mainloop()
