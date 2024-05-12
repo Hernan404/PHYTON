@@ -6,9 +6,6 @@ from pytube.exceptions import RegexMatchError, VideoUnavailable
 from moviepy.editor import VideoFileClip
 from tkinter import filedialog
 
-
-
-
 def startDownload():
     try:
         ytLink = link.get()
@@ -41,13 +38,16 @@ def startDownload():
                     os.rename(os.path.join(download_folder, "temp." + file_extension), filename)
                     print("Descarga Completada")
                     finishLabel.configure(text="Descargado!")
+                    progressBar.set(0)
+                    download.configure(text="Descargar otro video")
+
             else:
                 print("no tiene resolucion adecuada")
                 finishLabel.configure(text="No tiene resolucion adecuada", text_color="red")  
+
         else:
             print("Seleccione una carpeta de descarga")
             finishLabel.configure(text="Seleccione una carpeta de descarga", text_color="red")
-                                
     except RegexMatchError:
         print("enlace no es valido")
         finishLabel.configure(text="Error al descargar, Link invalido", text_color="red")
@@ -55,6 +55,9 @@ def startDownload():
         print("video no disponible o enlace incorrecto")
         finishLabel.configure(text="video no disponible o enlace incorrecto", text_color="red")
 
+def show_context_menu(event):
+    context_menu.tk_popup(event.x_root, event.y_root)
+        
 
 def on_progress(stream, chunk, bytes_remaining):
     total_size = stream.filesize 
@@ -97,7 +100,6 @@ link_frame.pack(padx=10, pady=10)
 title_label = customtkinter.CTkLabel(link_frame, text="Inserte link de YouTube")
 title_label.pack(side="left") # tamaño
 
-
 #barra de progresso
 pPercentaje = customtkinter.CTkLabel(app, text="0%")
 pPercentaje.pack()
@@ -115,10 +117,12 @@ link.pack()
 # botton de descarga 
 download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
 download.pack(padx=15, pady=15)
-#download.place(relx=1.0, rely=0, anchor="ne", padx=5, pady=5)
 link.pack(padx=5, pady=5)
 
+context_menu = tkinter.Menu(app, tearoff=0)
+context_menu.add_command(label="Pegar", command=lambda: link.event_generate("<<Paste>>"))
 
+link.bind("<Button-3>", show_context_menu)
 
 # menu desplegable
 download_choice = customtkinter.StringVar(app)
@@ -126,11 +130,7 @@ download_choice.set("Video MP4")
 
 download_menu = customtkinter.CTkOptionMenu(app, values=["Video MP4" , "Audio MP3"], command=lambda value: download_choice.set(value)) 
 download_menu.pack(padx=0, pady=0)
-#download_menu.place(relx=0.20, rely=0.20,) 
-                    #anchor=tkinter.CENTER)
 
-#download_menu.place(relx=0.76, rely=0.26, anchor=tkinter.W)
-#relx= costado; rely= altura
 
 folder_path_var = tkinter.StringVar() # defino una variable para guardar la ruta elejida
 folder_label = customtkinter.CTkLabel(app, text="Carpeta de destino") #creo que prompt para que el usuario elija la ruta
@@ -150,15 +150,6 @@ finishLabel.pack()
 resolution_frame = customtkinter.CTkFrame(app)
 resolution_frame.pack(padx=5, pady=5)
 
-# selector de resolucion
-resolutions = ["1080p","720p", "480p", "360p"]
-
-resolutions_var = tkinter.StringVar(app)
-resolutions_combobox = customtkinter.CTkComboBox(resolution_frame, values= resolutions, variable=resolutions_var )
-resolutions_combobox.pack(padx=1, pady=1)
-resolutions_combobox.set("1080p")
-
-#resolutions_combobox.place(x=50, y=10)
 
 # corro la app
 app.mainloop()
