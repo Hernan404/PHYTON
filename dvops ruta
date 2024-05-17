@@ -1,0 +1,60 @@
+
+
+Create a mock-up single page or mobile app for a simple project, think TODO lists or a URL shortener.
+
+Then write infrastructure as code and launch it.
+
+Then add CI/CD.
+
+Then create a simple API / database combo to store basic data.
+
+Then write infrastructure as code and launch it.
+
+Then add CI/CD.
+
+Update your front end to support it.
+
+Then write API and browser tests (eg Playwright or Selenium) for them.
+
+Then write load tests for them.
+
+Create automated alerts in DataDog or Sentry or something.
+
+Update your IAC to include load balancers, autoscaling, caching, a CDN and whatever else you need to help your app to scale.
+
+Then go multi-region.
+
+Then migrate to a different database structure. Or add data analytics. Or try a different frontend framework. Etc etc etc.
+
+Keeping your test bed a simple TODO app or whatever makes it easier to rip it apart and try whatever seems fun.
+
+And the nice thing about the cloud+IAC is that you can go global and scale to millions of imaginary users for a few hours, and then tear it all down when you're not using it.
+
+=======================================================
+  ===============================================
+
+Write a web application in React/Vue/Angular
+
+Write a REST API in Flask/Django/GoGin/whatever hooked to a database like Postgres
+
+Make your web application create and consume content from the API, locally at first.
+
+Write Dockerfiles for both projects and publish to a container registry like ghcr.io
+
+Deploy both containers with the solution of your choice, be it on a single node Docker runtime, or even a Kubernetes cluster.
+
+Setup DNS records such as your-app.io and api.your-app.io that point to both production workloads, and have Let'sEncrypt give you TLS certificate to access both project over the internet via HTTPS.
+
+Make your production front-end communicate with your production API. Figure out what CORS is and why it may be a problem in that setup.
+
+Document everything in each projects README.md file.
+
+Write unit tests for both projects and end-to-end tests that make your front-end interacting with your API.
+
+Write CI pipelines that run tests automatically on every push.
+
+Write build pipelines that publish your containers automatically on each git tag of your main branch. Make sure to follow semantic versionning.
+
+Find a solution that automates promotion of new artifacts in production when conditions are met.
+
+You now have a production level application running. Make sure it runs 24/7
