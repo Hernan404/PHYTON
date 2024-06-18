@@ -97,7 +97,7 @@ link_frame.pack(padx=10, pady=10)
 
 
 # añado la interfaz 
-title_label = customtkinter.CTkLabel(link_frame, text="Inserte link de YouTube")
+title_label = customtkinter.CTkLabel(link_frame, text="INSERTE LINK DE YOUTUBE")
 title_label.pack(side="left") # tamaño
 
 #barra de progresso
@@ -131,12 +131,15 @@ download_choice.set("Video MP4")
 download_menu = customtkinter.CTkOptionMenu(app, values=["Video MP4" , "Audio MP3"], command=lambda value: download_choice.set(value)) 
 download_menu.pack(padx=0, pady=0)
 
+frame = customtkinter.CTkFrame(app)
+frame.pack(pady=30, padx=30)
 
+# ruta de carpeta
 folder_path_var = tkinter.StringVar() # defino una variable para guardar la ruta elejida
-folder_label = customtkinter.CTkLabel(app, text="Carpeta de destino") #creo que prompt para que el usuario elija la ruta
-folder_label.pack()
+folder_label = customtkinter.CTkLabel(frame, text="RUTA DE DESTINO") #creo que prompt para que el usuario elija la ruta
+folder_label.pack(pady=5, padx=5)
 
-folder_path_entry = customtkinter.CTkEntry(app, textvariable=folder_path_var, state="readonly", width=100) 
+folder_path_entry = customtkinter.CTkEntry(app, textvariable=folder_path_var, state="readonly", width=250) 
 folder_path_entry.pack()
 
 #creo el boton 
