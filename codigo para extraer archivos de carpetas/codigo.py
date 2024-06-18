@@ -4,16 +4,16 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Use the absolute path for the folder
+# poner el path absoluto al archivo
 folder = r""
 
 def move_files_to_main_folder(src_folder, dst_folder):
     for item in os.listdir(src_folder):
         src_path = os.path.join(src_folder, item)
         if os.path.isdir(src_path):
-            # Recursively move contents of subdirectory
+            # recursivamente mover todo al sub directorio
             move_files_to_main_folder(src_path, dst_folder)
-            # Remove the empty subdirectory
+            # remuevo el subdirectorio
             os.rmdir(src_path)
         else:
             dst_path = os.path.join(dst_folder, item)
