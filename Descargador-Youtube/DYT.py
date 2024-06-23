@@ -3,7 +3,7 @@ import customtkinter
 import os
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError, VideoUnavailable
-from moviepy.editor import VideoFileClip
+from moviepy.editor import AudioFileClip
 from tkinter import filedialog
 
 def startDownload():
@@ -11,17 +11,24 @@ def startDownload():
         ytLink = link.get()
         ytObject = YouTube(ytLink, on_progress_callback=on_progress)
         
-        download_folder = folder_path_var.get()  # Get the selected download folder
+        download_folder = folder_path_var.get()  
+        progressBar.set(0)
 
         if download_folder:
             if download_choice.get() == "Video MP4":
                 video = ytObject.streams.get_highest_resolution()
                 file_extension = video.mime_type.split("/")[-1]
-                filename = os.path.join(download_folder, video.default_filename)
+                base_filename = os.path.join(download_folder, video.default_filename)
             else:
                 video = ytObject.streams.filter(only_audio=True).first()
                 file_extension = "mp3"
+                base_filename = os.path.join(download_folder, ytObject.title + ".mp3")
+                temp_filename = os.path.join(download_folder, "temp." + file_extension)
                 filename = os.path.join(download_folder, ytObject.title + ".mp3")
+           
+            filename = base_filename
+            if os.path.exists(filename):
+                filename = unique_name(base_filename, file_extension)
 
             if video:
                 title_label.configure(text=ytObject.title, text_color="white")
@@ -30,30 +37,39 @@ def startDownload():
                 video.download(output_path=download_folder, filename=(video.default_filename.replace(".mp4", "") + "." + file_extension))
 
                 if download_choice.get() == "Audio MP3":
-                    if convert_to_mp3(os.path.join(download_folder, "temp." + file_extension), filename):
-                        os.remove(os.path.join(download_folder, "temp." + file_extension))
-                        print("Descarga Completada")
-                        finishLabel.configure(text="Descargado!")
-                else:
-                    os.rename(os.path.join(download_folder, "temp." + file_extension), filename)
-                    print("Descarga Completada")
-                    finishLabel.configure(text="Descargado!")
-                    progressBar.set(0)
-                    download.configure(text="Descargar otro video")
-
+                   if os.path.exists(temp_filename):
+                    if convert_to_mp3(temp_filename, filename):
+                        os.remove(temp_filename)
+                        
+                finishLabel.configure(link_frame, text="Downloaded!", text_color="green")#, delete_after = 5)
+                download.configure(text="Download")
+                    
             else:
-                print("no tiene resolucion adecuada")
-                finishLabel.configure(text="No tiene resolucion adecuada", text_color="red")  
+                print("Resolution is not adecuate")
+                finishLabel.configure(text="It doesnt have adecuate resolution", text_color="red")  
+      
 
-        else:
-            print("Seleccione una carpeta de descarga")
-            finishLabel.configure(text="Seleccione una carpeta de descarga", text_color="red")
     except RegexMatchError:
-        print("enlace no es valido")
-        finishLabel.configure(text="Error al descargar, Link invalido", text_color="red")
+        print("Link not valid")
+        finishLabel.configure(text="Download Error, Invalid link", text_color="red")
     except VideoUnavailable:
-        print("video no disponible o enlace incorrecto")
+        print("Video not avalible or link incorrecto")
         finishLabel.configure(text="video no disponible o enlace incorrecto", text_color="red")
+    finally: 
+        app.after(3000, delay)
+
+def unique_name(base_filename, extension):
+    counter = 1
+    filename = base_filename
+    while os.path.exists(filename):
+        filename = f"{base_filename} ({counter}).{extension}"
+        counter +=1
+    return filename 
+def delay():
+        pPercentaje.configure(text="0%")
+        progressBar.set(0)
+        finishLabel.configure(text="")
+
 
 def show_context_menu(event):
     context_menu.tk_popup(event.x_root, event.y_root)
@@ -71,13 +87,14 @@ def on_progress(stream, chunk, bytes_remaining):
     progressBar.set(float(percentage_of_compeletion)/100)
 
 def convert_to_mp3(input_file, output_file):
-    video = VideoFileClip(input_file)
-    video.audio.write_audiofile(output_file)
-    video.close()
+    audio = AudioFileClip(input_file)
+    audio.write_audiofile(output_file, codec='libmp3lame')
+    audio.close()
 
 def choose_folder():
-     folder_selected = filedialog.askdirectory()
-     folder_path_var.set(folder_selected)
+    folder_selected = filedialog.askdirectory()
+    if folder_selected:
+        folder_path_var.set(folder_selected)
 
 
 
@@ -97,7 +114,7 @@ link_frame.pack(padx=10, pady=10)
 
 
 # añado la interfaz 
-title_label = customtkinter.CTkLabel(link_frame, text="INSERTE LINK DE YOUTUBE")
+title_label = customtkinter.CTkLabel(link_frame, text="INSERT YOUTUBE LINK")
 title_label.pack(side="left") # tamaño
 
 #barra de progresso
@@ -115,12 +132,12 @@ link = customtkinter.CTkEntry(app, width=350, height=40, textvariable=url_var)
 link.pack()
 
 # botton de descarga 
-download = customtkinter.CTkButton(app, text="Descargar", command=startDownload) 
+download = customtkinter.CTkButton(app, text="DOWNLOAD", command=startDownload) 
 download.pack(padx=15, pady=15)
 link.pack(padx=5, pady=5)
 
 context_menu = tkinter.Menu(app, tearoff=0)
-context_menu.add_command(label="Pegar", command=lambda: link.event_generate("<<Paste>>"))
+context_menu.add_command(label="Paste", command=lambda: link.event_generate("<<Paste>>"))
 
 link.bind("<Button-3>", show_context_menu)
 
@@ -135,15 +152,16 @@ frame = customtkinter.CTkFrame(app)
 frame.pack(pady=30, padx=30)
 
 # ruta de carpeta
-folder_path_var = tkinter.StringVar() # defino una variable para guardar la ruta elejida
-folder_label = customtkinter.CTkLabel(frame, text="RUTA DE DESTINO") #creo que prompt para que el usuario elija la ruta
-folder_label.pack(pady=5, padx=5)
+default_download_folder = os.path.expanduser("~/Downloads")
+folder_path_var = tkinter.StringVar(value= default_download_folder) # defino una variable para guardar la ruta elejida
+folder_label = customtkinter.CTkLabel(frame, text="FILE ROOT") #creo que prompt para que el usuario elija la ruta
+folder_label.pack(pady=1, padx=1)
 
-folder_path_entry = customtkinter.CTkEntry(app, textvariable=folder_path_var, state="readonly", width=250) 
-folder_path_entry.pack()
+folder_path_entry = customtkinter.CTkEntry(app, textvariable=folder_path_var, state="readonly", width=150) 
+folder_path_entry.pack(pady=1, padx=1)
 
 #creo el boton 
-browse_button = customtkinter.CTkButton(app, text="Buscar", command=choose_folder)
+browse_button = customtkinter.CTkButton(app, text="...", command=choose_folder, width=20)
 browse_button.pack(padx=10, pady=10)
 
 # termino la descarga 
@@ -156,3 +174,4 @@ resolution_frame.pack(padx=5, pady=5)
 
 # corro la app
 app.mainloop()
+
